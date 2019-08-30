@@ -6,12 +6,10 @@ import face_recognition_models
 import cv2
 import face_recognition
 import sqlite3
-import os
+import os, os.path
 
 sampleN = 0
 N = 100
-
-
 
 detector = dlib.get_frontal_face_detector()
 
@@ -111,7 +109,8 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    if sampleN > N:
+    intNumberofFiles = len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
+    if intNumberofFiles >= N:
         break
 
 video_capture.release()
