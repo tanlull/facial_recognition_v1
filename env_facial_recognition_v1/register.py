@@ -6,10 +6,12 @@ import face_recognition_models
 import cv2
 import face_recognition
 import sqlite3
-import os, os.path
+import os
+import os.path
+import random
 
 sampleN = 0
-N = 100
+N = 50
 
 detector = dlib.get_frontal_face_detector()
 
@@ -47,7 +49,7 @@ while True:
 
     dets = detector(rgb_small_frame, 1)
 
-    #print("Number of faces detected: {}".format(len(dets)))
+    # print("Number of faces detected: {}".format(len(dets)))
 
     for i, d in enumerate(dets):
 
@@ -78,15 +80,14 @@ while True:
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35),
                           (right, bottom), (0, 0, 99), cv2.FILLED)
-            cv2.putText(frame, 'Bulurry..{}'.format(blur_check), (left + 6, bottom - 6),
+            cv2.putText(frame, 'Bulurry..', (left + 6, bottom - 6),
                         font, 1.0, (255, 255, 255), 1)
+            # cv2.putText(frame, 'Bulurry..{}'.format(blur_check), (left + 6, bottom - 6),
+            #            font, 1.0, (255, 255, 255), 1)
         else:
 
-            
-
-            cv2.imwrite("./data/images_color/"+uname+"/" +uname+
-                        "."+str(sampleN) + ".jpg", roi)
-
+            cv2.imwrite("./data/images_color/"+uname+"/" + \
+                        str(random.random()) + ".jpg", roi)
 
             # Draw a box around the face
             cv2.rectangle(frame, (left, top), (right, bottom), (51, 102, 0), 3)
@@ -99,7 +100,7 @@ while True:
                         font, 1.0, (255, 255, 255), 1)
 
     # Display the video output
-    window_name = 'projector'
+    window_name='projector'
     cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,
                           cv2.WINDOW_FULLSCREEN)
@@ -109,7 +110,8 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    intNumberofFiles = len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
+    intNumberofFiles=len([name for name in os.listdir(
+        directory) if os.path.isfile(os.path.join(directory, name))])
     if intNumberofFiles >= N:
         break
 
