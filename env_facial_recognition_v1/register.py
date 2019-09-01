@@ -91,7 +91,7 @@ def insertImagePath(u_id):
 
     for img_path in listImagePath(email.replace('\'', '')):
         sql = "INSERT INTO tbImage(u_id,img_path) Values( "+str(
-            u_id)+",'./data/images_colors/"+email.replace('\'', '')+"/"+img_path+"')"
+            u_id)+",'./data/images_color/"+email.replace('\'', '')+"/"+img_path+"')"
         print(sql)
         conn.execute(sql)
         conn.commit()
@@ -103,7 +103,7 @@ try:
     insertUserProfile(email, firstname)
 
 except Exception as err:
-    print('Query Failed: %s\nError: %s' % (query, str(err)))
+    print('\nError: %s' % (str(err)))
 
 
 while True:
@@ -187,7 +187,11 @@ while True:
     if intNumberofFiles >= N:
         break
 
-u_id = selectUserID(email)
-insertImagePath(u_id)
+try:
+    u_id = selectUserID(email)
+    insertImagePath(u_id)
+except Exception as err:
+    print('\nError: %s' % (str(err)))
+
 video_capture.release()
 cv2.destroyAllWindows()
