@@ -11,7 +11,7 @@ import os.path
 import random
 import sys
 
-N = 100
+N = 20
 
 
 detector = dlib.get_frontal_face_detector()
@@ -21,11 +21,11 @@ video_capture = cv2.VideoCapture(0)
 video_capture.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
 
-email = str(input('Enter your Emial-Address:'))
+email = str(input('Enter your Emial-Address: '))
 firstname = str(input('Enter Your First-name: '))
 
 
-directory = "./data/images_color/"+firstname.replace('\'','')+"/"
+directory = "./data/images_color/"+email.replace('\'', '')+"/"
 
 intNumberofFiles = 0
 
@@ -38,27 +38,72 @@ def variance_of_laplacian(image):
     # measure, which is simply the variance of the Laplacian
     return cv2.Laplacian(image, cv2.CV_64F).var()
 
-def insertUserProfile(email,firstname):
+
+def insertUserProfile(email, firstname):
     isRowExist = 0
     conn = sqlite3.connect("./data/dbFacerecognition.db")
     sql = "SELECT * FROM tbProfile WHERE email="+email
     rows = conn.execute(sql)
     for row in rows:
         isRowExist = 1
-    
-    if(isRowExist==1):
-        print("Existing {} email addresss !! ".format(email)) 
+
+    if(isRowExist == 1):
+        print("Existing {} email addresss !! ".format(email.replace('\'', '')))
         sys.exit(-1)
-        
+
     else:
-        sql = "INSERT INTO tbProfile(email,first_name) Values( "+email+","+firstname+")"
-        
-   
+        sql = "INSERT INTO tbProfile(email,first_name) Values( " + \
+            email+","+firstname+")"
+
     conn.execute(sql)
     conn.commit()
     conn.close()
 
-insertUserProfile(email,firstname)
+
+def listImagePath(email):
+    foldername = email
+    path = './data/images_color/'+foldername
+    dirs = os.listdir(path)
+    list_files = []
+    for filename in dirs:
+        (shortname, extension) = os.path.splitext(filename)
+        if extension == '.jpg':
+            list_files.append(filename)
+    return list_files
+
+# Select u_id by email
+
+
+def selectUserID(email):
+    conn = sqlite3.connect("./data/dbFacerecognition.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM tbProfile WHERE email=?",
+                   (email.replace('\'', ''), ))
+    u_id = cursor.fetchone()
+    return u_id[0]
+
+# Insert photo path to database
+
+
+def insertImagePath(u_id):
+
+    conn = sqlite3.connect("./data/dbFacerecognition.db")
+
+    for img_path in listImagePath(email.replace('\'', '')):
+        sql = "INSERT INTO tbImage(u_id,img_path) Values( "+str(
+            u_id)+",'./data/images_colors/"+email.replace('\'', '')+"/"+img_path+"')"
+        print(sql)
+        conn.execute(sql)
+        conn.commit()
+
+    conn.close()
+
+
+try:
+    insertUserProfile(email, firstname)
+
+except Exception as err:
+    print('Query Failed: %s\nError: %s' % (query, str(err)))
 
 
 while True:
@@ -113,7 +158,7 @@ while True:
             #            font, 1.0, (255, 255, 255), 1)
         else:
 
-            cv2.imwrite("./data/images_color/"+firstname.replace('\'','')+"/" +
+            cv2.imwrite("./data/images_color/"+email.replace('\'', '')+"/" +
                         str(random.random()) + ".jpg", roi)
             intNumberofFiles = len([name for name in os.listdir(
                 directory) if os.path.isfile(os.path.join(directory, name))])
@@ -142,5 +187,7 @@ while True:
     if intNumberofFiles >= N:
         break
 
+u_id = selectUserID(email)
+insertImagePath(u_id)
 video_capture.release()
 cv2.destroyAllWindows()

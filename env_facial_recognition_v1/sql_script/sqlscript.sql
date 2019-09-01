@@ -4,7 +4,7 @@ CREATE TABLE 'tbProfile' (
   'first_name' NVARCHAR(50) ,
   'last_name' NVARCHAR(50)  ,
   'email' NVARCHAR(50)  NOT NULL,
-  'mobile' NVARCHAR(20) ,
+  'mobile' NVARCHAR(20)  NOT NULL,
   'create_date' DATETIME DEFAULT NULL
 )
 
@@ -19,4 +19,3 @@ CREATE TABLE 'tbImage' (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) 
-
