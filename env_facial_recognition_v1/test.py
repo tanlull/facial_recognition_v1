@@ -10,6 +10,7 @@ import os
 import os.path
 import random
 import sys
+import pickle
 
 
 # conn = sqlite3.connect("./data/dbFacerecognition.db")
@@ -36,11 +37,18 @@ def encode_SavetoDB(u_id):
     rows = cursor.fetchall()
 
     for row in rows:
-        #print(row[0])
-        face_locations = face_recognition.face_locations(str(row[0]))
-        face_encodings = face_recognition.face_encodings(str(row[0]), face_locations)
         
-        print(face_encodings)  
+        _image = face_recognition.load_image_file(str(row[0]))
+
+        _encoding = face_recognition.face_encodings(_image)
+
+        #print(type(_encoding[0]))  
+
+        print(_encoding)
+
+        with open('dataset_faces.dat', 'wb') as f:
+                pickle.dump(all_face_encodings, f)
+        
 
         
       
