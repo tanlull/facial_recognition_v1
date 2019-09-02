@@ -44,10 +44,15 @@ def encode_SavetoDB(u_id):
 
         #print(type(_encoding[0]))  
 
-        print(_encoding)
 
-        with open('dataset_faces.dat', 'wb') as f:
-                pickle.dump(all_face_encodings, f)
+        
+
+        # before write encoding to database
+        encoding = pickle.dumps(_encoding)
+        
+        # read encoding
+        encoding = pickle.loads(eval(str(encoding)))
+        print(encoding)
         
 
         
