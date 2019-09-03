@@ -5,7 +5,7 @@ CREATE TABLE 'tbProfile' (
   'last_name' NVARCHAR(50)  ,
   'email' NVARCHAR(50)  NOT NULL,
   'mobile' NVARCHAR(20)  NOT NULL,
-  'create_date' DATETIME DEFAULT NULL
+  'create_date' TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 
 DROP TABLE IF EXISTS 'tbImage';

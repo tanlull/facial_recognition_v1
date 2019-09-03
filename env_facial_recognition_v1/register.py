@@ -11,7 +11,7 @@ import os.path
 import random
 import sys
 
-N = 20
+N = 50
 
 
 detector = dlib.get_frontal_face_detector()
@@ -95,8 +95,32 @@ def insertImagePath(u_id):
         print(sql)
         conn.execute(sql)
         conn.commit()
-
     conn.close()
+    
+# Update Encoding to Database
+def encode_SavetoDB(u_id):
+    conn = sqlite3.connect("./data/dbFacerecognition.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT img_path FROM tbImage WHERE u_id=?", (u_id, ))
+
+    rows = cursor.fetchall()
+
+    for row in rows:
+
+        _image = face_recognition.load_image_file(str(row[0]))
+
+        _encoding = face_recognition.face_encodings(_image)
+
+        # before write encoding to database
+        encoding = pickle.dumps(_encoding)
+
+        sql = ''' UPDATE tbImage
+              SET img_encoding = ?
+              WHERE u_id = ?'''
+
+        cur = conn.cursor()
+        cur.execute(sql, [encoding, u_id])
+        conn.commit()
 
 
 try:
@@ -190,6 +214,7 @@ while True:
 try:
     u_id = selectUserID(email)
     insertImagePath(u_id)
+    encode_SavetoDB(u_id)
 except Exception as err:
     print('\nError: %s' % (str(err)))
 
