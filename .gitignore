@@ -16,8 +16,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.vscode/
-.vscode/settings.json
+.vscode
+# .vscode/
+# .vscode/settings.json
 __pycache__/
 data/
 sql_script/
