@@ -17,6 +17,7 @@ Temporary Items
 .apdisk
 
 .vscode/
+.vscode/settings.json
 __pycache__/
 data/
 sql_script/
