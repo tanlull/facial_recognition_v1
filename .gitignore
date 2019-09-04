@@ -1,3 +1,25 @@
+# General
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+.vscode/
+__pycache__/
+data/
+sql_script/
+
 env_facial_recognition_v1/ex.py
 env_facial_recognition_v1/test.py
-env_facial_recognition_v1/data/*
