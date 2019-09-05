@@ -11,7 +11,10 @@ import os.path
 import random
 import sys
 
-N = 50
+import pickle
+from PIL import Image
+
+N = 100
 
 
 detector = dlib.get_frontal_face_detector()
@@ -80,7 +83,10 @@ def selectUserID(email):
     cursor.execute("SELECT id FROM tbProfile WHERE email=?",
                    (email.replace('\'', ''), ))
     u_id = cursor.fetchone()
+    
+    conn.close()
     return u_id[0]
+
 
 # Insert photo path to database
 
@@ -94,7 +100,7 @@ def insertImagePath(u_id):
             u_id)+",'./data/images_color/"+email.replace('\'', '')+"/"+img_path+"')"
         print(sql)
         conn.execute(sql)
-        conn.commit()
+    conn.commit()
     conn.close()
     
 # Update Encoding to Database
@@ -110,17 +116,20 @@ def encode_SavetoDB(u_id):
         _image = face_recognition.load_image_file(str(row[0]))
 
         _encoding = face_recognition.face_encodings(_image)
-
+        
+        
         # before write encoding to database
         encoding = pickle.dumps(_encoding)
 
         sql = ''' UPDATE tbImage
-              SET img_encoding = ?
-              WHERE u_id = ?'''
+              SET img_encoding = ?             
+              WHERE u_id = ?
+              and img_path = ?'''
 
         cur = conn.cursor()
-        cur.execute(sql, [encoding, u_id])
-        conn.commit()
+        cur.execute(sql, [encoding, u_id,str(row[0])])
+    conn.commit()
+    conn.close()
 
 
 try:
@@ -169,8 +178,8 @@ while True:
         gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         blur_check = variance_of_laplacian(gray_roi)
 
-        print('Bulurry value = {}'.format(blur_check))
-        if blur_check < 400:
+        print('Blurry value = {}'.format(blur_check))
+        if blur_check < 200:
             # Draw a box around the face
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 99), 3)
             # Draw a label with a name below the face

@@ -47,7 +47,7 @@ def selectJoinTable():
 
         known_face_names.append(str(row[0]))
        
-selectJoinTable()
+# selectJoinTable()
 
 while True:
     # Grab a single frame of video
