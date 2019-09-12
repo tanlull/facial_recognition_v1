@@ -1,5 +1,4 @@
 import psycopg2 as pg
-import logging
 import sys
 import numpy as np
 import db
@@ -7,13 +6,8 @@ import pickle
 import face_recognition
 import os
 
-logger = logging.getLogger('database')
-logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+import log as logger
+logger.init("db.py",logger.INFO)
 
 from six.moves import configparser
 config = configparser.ConfigParser()
@@ -36,7 +30,7 @@ def connect(db):
             tpassword=config.get("PrdDB", "password")
        #logger.info("{0},{1},{2},{3}".format(thost,tdatabase,tuser,tpassword))
         conn = pg.connect(host=thost,database=tdatabase, user=tuser, password=tpassword)
-        logger.info("Database connect successfully")
+        logger.debug("Database connect successfully")
         return True
         
     except:

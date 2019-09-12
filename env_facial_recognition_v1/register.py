@@ -9,19 +9,13 @@ import os.path
 import random
 import sys
 import db
-import logging
 import psycopg2 as pg
 
 import pickle
 from PIL import Image
 
-logger = logging.getLogger('register')
-logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+import log as logger
+logger.init("Register.py",logger.INFO)
 
 N = 3
 BLUR_VALUE = 50
@@ -57,10 +51,10 @@ db.connect("test")
 try:
     
     db.insertUserProfile(ba, firstname)
-    logger.info("insertUserProfile successfully")
+    logger.info("insert User Profile successfully")
 
 except Exception as err:
-    print('\nError: %s' % (str(err)))
+    logger.error('\nError: %s' % (str(err)))
 
 
 while True:
@@ -150,8 +144,9 @@ try:
     id = db.selectUserID(ba)
     db.insertImagePath(id,ba,IMAGE_PATH)
     db.encode_SavetoDB(ba)
+    logger.info("Save to DB Successfully")
 except Exception as err:
-    print('\nError: %s' % (str(err)))
+    logger.error('\nError: %s' % (str(err)))
 
 video_capture.release()
 cv2.destroyAllWindows()
