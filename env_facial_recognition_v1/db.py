@@ -7,13 +7,14 @@ import face_recognition
 import os
 
 import log as logger
-logger.init("db.py",logger.INFO)
+logger.init("db.py")
 
 from six.moves import configparser
 config = configparser.ConfigParser()
 config.read("parameters.ini")
 
 conn = {};
+
 
 def connect(db):
     global conn

@@ -1,3 +1,7 @@
+## USAGE 
+## import log as logger
+## logger.init("logger name",logger.INFO)
+
 import logging
 
 logger  = logging.getLogger('LOG')
@@ -8,21 +12,23 @@ WARNING = logging.WARNING
 ERROR = logging.ERROR
 CRITICAL = logging.CRITICAL
 
-def init(name,level):
+def init(logname,loglevel=logging.WARNING):
     global logger
-    logger  = logging.getLogger(name)
-    logger.setLevel(level)
+    logger  = logging.getLogger(logname)
+    logger.setLevel(loglevel)
     ch = logging.StreamHandler()
-    ch.setLevel(level)
+    ch.setLevel(loglevel)
     formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
     logger.warning("LOG Level is {}".format(logging.getLevelName(logger.getEffectiveLevel())))
 
 def getLevel():
+    
     return logging.getLevelName(logger.getEffectiveLevel())
 
 def setLevel(level):
+    logger.warning("Overriding Log Level to {}".format(logging.getLevelName(level)))
     logger.setLevel(level)
 
 def debug(msg):

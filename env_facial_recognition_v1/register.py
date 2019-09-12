@@ -14,13 +14,17 @@ import psycopg2 as pg
 import pickle
 from PIL import Image
 
+
 import log as logger
+
 logger.init("Register.py",logger.INFO)
 
 N = 3
 BLUR_VALUE = 50
 DB = 'test'
 IMAGE_PATH = "./data/images_color/"
+
+db.connect(DB)
 
 detector = dlib.get_frontal_face_detector()
 
@@ -46,7 +50,7 @@ def variance_of_laplacian(image):
     # measure, which is simply the variance of the Laplacian
     return cv2.Laplacian(image, cv2.CV_64F).var()
 
-db.connect("test")
+
 
 try:
     
@@ -54,7 +58,7 @@ try:
     logger.info("insert User Profile successfully")
 
 except Exception as err:
-    logger.error('\nError: %s' % (str(err)))
+    logger.info('\nError: %s' % (str(err)))
 
 
 while True:
