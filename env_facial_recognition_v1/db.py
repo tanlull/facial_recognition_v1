@@ -5,9 +5,11 @@ import db
 import pickle
 import face_recognition
 import os
+import base64
+import _pickle as cPickle
 
 import log as logger
-logger.init("db.py")
+logger.init("db.py",logger.INFO)
 
 from six.moves import configparser
 config = configparser.ConfigParser()
@@ -53,6 +55,7 @@ def insertImagePath(id,ba,path):
     except pg.Error as e:
         logger.error(e.pgerror)
 
+
 # Update Encoding to Database
 def encode_SavetoDB(ba):
     global conn
@@ -67,18 +70,38 @@ def encode_SavetoDB(ba):
 
             _image = face_recognition.load_image_file(str(row[0]))
 
+            # list data type
             _encoding = face_recognition.face_encodings(_image)
-            
-            
+            logger.debug(type(_encoding))
+            logger.debug(_encoding)
+
             # before write encoding to database
-            encoding = pickle.dumps(_encoding)
-            #logger.info(type(encoding))
-            #logger.info(encoding)
+            encoding = cPickle.dumps(_encoding)
+            logger.debug(type(encoding))
+            logger.debug(encoding)
+
+            ### Convert back to list
+            #decoding2 = pickle.loads(encoding)
+            #logger.debug(type(decoding2))
+            #logger.debug(decoding2)
+
             sql = """UPDATE image SET img_encoding = %s  WHERE id = %s and img_path = %s"""
             cur = conn.cursor()
             cur.execute(sql,(encoding, ba,str(row[0])))
         conn.commit()
 
+    except pg.Error as e:
+        logger.error(e.pgerror)
+
+
+def decode_DB(ba):
+    try:
+        global conn
+        cursor = conn.cursor()
+        sql = """SELECT i.* from image i where i.id = %s"""
+        cursor.execute(sql,(ba,))
+        id = cursor.fetchone()
+        return cPickle.loads(id[2])
     except pg.Error as e:
         logger.error(e.pgerror)
 
@@ -95,7 +118,6 @@ def selectUserID(ba):
         return id[0]
     except pg.Error as e:
         logger.error(e.pgerror)
-
 
 
 def insertUserProfile(ba, firstname):

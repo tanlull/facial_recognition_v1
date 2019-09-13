@@ -148,10 +148,17 @@ try:
     id = db.selectUserID(ba)
     db.insertImagePath(id,ba,IMAGE_PATH)
     db.encode_SavetoDB(ba)
+
+    x = db.decode_DB(ba)
     logger.info("Save to DB Successfully")
+    logger.debug(x)
+    
 except Exception as err:
     logger.error('\nError: %s' % (str(err)))
 
+
+
+ 
 video_capture.release()
 cv2.destroyAllWindows()
 
