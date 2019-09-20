@@ -10,7 +10,7 @@ import pickle
 import db
 import log as logger
 
-logger.init("Recognition.py",logger.INFO)
+logger.init("Recognition.py",logger.DEBUG)
 
 
 # Get a reference to webcam #0 (the default one)
@@ -63,7 +63,7 @@ while True:
             # See if the face is a match for the known face(s)
             
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown"
+            name = "Unregistered"
 
             # # If a match was found in known_face_encodings, just use the first one.
             # if True in matches:
@@ -72,8 +72,10 @@ while True:
 
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+            logger.debug(type(face_distances)) 
+            logger.debug(len(face_distances))
             best_match_index = np.argmin(face_distances)
-            logger.info(" Match Index = {}".format(best_match_index))
+            logger.debug(" Match Index = {}".format(best_match_index))
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 

@@ -19,7 +19,7 @@ import log as logger
 
 logger.init("Register.py",logger.INFO)
 
-N = 3
+N = 1
 BLUR_VALUE = 50
 DB = 'test'
 IMAGE_PATH = "./data/images_color/"
@@ -120,7 +120,7 @@ while cv2.waitKey(1) < 0:
         else:
 
             cv2.imwrite(IMAGE_PATH+ba.replace('\'', '')+"/" +
-                        str(random.random()) + ".jpg", roi)
+                        str(random.random()) + ".jpg", frame)
             intNumberofFiles = intNumberofFiles+1;
 
             # Draw a box around the face

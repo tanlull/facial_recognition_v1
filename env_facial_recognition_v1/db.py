@@ -6,6 +6,7 @@ import pickle
 import face_recognition
 import os
 import base64
+import cv2
 import _pickle as cPickle
 
 import log as logger
@@ -68,8 +69,13 @@ def encode_SavetoDB(ba):
 
             _image = face_recognition.load_image_file(str(row[0]))
 
-            # list data type
-            _encoding = face_recognition.face_encodings(_image)
+            small_frame = cv2.resize(_image, (0, 0), fx=0.25, fy=0.25)
+
+            rgb_small_frame = small_frame[:, :, ::-1]
+            # Find all the faces and face encodings in the current frame of video
+            face_locations = face_recognition.face_locations(rgb_small_frame)
+            _encoding = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
             logger.debug(type(_encoding))
             logger.debug(_encoding)
 

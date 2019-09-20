@@ -25,26 +25,33 @@ biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
 img3 = face_recognition.load_image_file("tanya.jpg")
 img3_en = face_recognition.face_encodings(img3)[0]
 
+img4 = face_recognition.load_image_file("bingo.jpg")
+img4_en = face_recognition.face_encodings(img4)[0]
+
+img5 = face_recognition.load_image_file("lulliya.jpg")
+img5_en = face_recognition.face_encodings(img5)[0]
+
 # Create arrays of known face encodings and their names
 known_face_encodings = [
     obama_face_encoding,
     biden_face_encoding,
-    img3_en
+    img4_en,
+    img3_en,
+    img5_en
 ]
 known_face_names = [
     "Barack Obama",
     "Joe Biden",
-    "Tanya S."
+    "Bingo",
+    "Tanya S.",
+    "Lulliya "
 ]
 
 
+# logger.info(type(img3_en))
 
-
-
-logger.info(type(img3_en))
-
-logger.info(len(img3_en))
-logger.info(img3_en)
+# logger.info(len(img3_en))
+# logger.info(img3_en)
 
 # Initialize some variables
 face_locations = []
@@ -73,7 +80,7 @@ while True:
             # See if the face is a match for the known face(s)
             
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown"
+            name = ""
 
             # # If a match was found in known_face_encodings, just use the first one.
             # if True in matches:
@@ -83,6 +90,7 @@ while True:
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
+            logger.debug(" Match Index = {}".format(best_match_index))
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 
