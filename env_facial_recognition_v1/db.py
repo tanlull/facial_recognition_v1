@@ -42,7 +42,6 @@ def connect(db):
 
 
 def insertImagePath(id,ba,path):
-    global conn
     try:
         cur = conn.cursor()
 
@@ -58,7 +57,6 @@ def insertImagePath(id,ba,path):
 
 # Update Encoding to Database
 def encode_SavetoDB(ba):
-    global conn
     try:
         cursor = conn.cursor()
         sql="""SELECT img_path FROM image WHERE id=%s"""
@@ -96,7 +94,6 @@ def encode_SavetoDB(ba):
 
 def decode_DB(ba):
     try:
-        global conn
         cursor = conn.cursor()
         sql = """SELECT i.* from image i where i.id = %s"""
         cursor.execute(sql,(ba,))
@@ -109,7 +106,6 @@ def decode_DB(ba):
 
 def selectUserID(ba):
     try:
-        global conn
         cursor = conn.cursor()
         sql = """SELECT id FROM profile WHERE ba=%s"""
         cursor.execute(sql,(ba,))
@@ -123,7 +119,6 @@ def selectUserID(ba):
 def insertUserProfile(ba, firstname):
     try:
         isRowExist = 0
-        global conn
         cur = conn.cursor()
         sql = "SELECT * FROM profile WHERE ba='{0}'".format(ba)
         logger.debug(sql)
@@ -157,3 +152,27 @@ def listImagePath(ba,path):
         if extension == '.jpg':
             list_files.append(filename)
     return list_files
+
+
+def getAllFaceData():
+    # Create arrays of known face encodings and their names
+    known_face_encodings = []
+    known_face_names =[]
+    known_face_ba =[]
+    # global conn
+    cursor = conn.cursor()
+    sql = '''select p.first_name,p.ba,i.img_encoding from image i,profile p where i.id = p.ba'''
+    cursor.execute(sql)
+
+    rows = cursor.fetchall()
+
+    for row in rows:
+        # read encoding
+    
+        encode = cPickle.loads(row[2])
+        known_face_encodings.append(encode)
+        known_face_names.append(str(row[0]))
+        known_face_ba.append(str(row[1]))
+    
+    return known_face_names,known_face_encodings,known_face_ba
+

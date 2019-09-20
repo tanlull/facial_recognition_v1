@@ -6,10 +6,10 @@ CREATE TABLE public.image (
 
 CREATE TABLE public.profile (
 	id serial NOT NULL,
-	first_name bpchar(100) NULL,
-	last_name bpchar(100) NULL,
-	ba bpchar(50) NOT NULL,
-	service bpchar(20) NULL,
+	first_name varchar(100) NULL,
+	last_name varchar(100) NULL,
+	ba varchar(50) NOT NULL,
+	service varchar(20) NULL,
 	create_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT profile_pkey PRIMARY KEY (id)
 );

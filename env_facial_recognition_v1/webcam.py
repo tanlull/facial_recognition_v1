@@ -5,8 +5,10 @@ from PIL import ImageFile
 import face_recognition_models
 import cv2
 import face_recognition
-import sqlite3
 
+import log as logger
+
+logger.init("webcam.py",logger.INFO)
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
@@ -19,15 +21,24 @@ obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
 biden_image = face_recognition.load_image_file("biden.jpg")
 biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
 
+
+img3 = face_recognition.load_image_file("tanya.jpg")
+img3_en = face_recognition.face_encodings(img3)[0]
+
 # Create arrays of known face encodings and their names
 known_face_encodings = [
     obama_face_encoding,
-    biden_face_encoding
+    biden_face_encoding,
+    img3_en
 ]
 known_face_names = [
     "Barack Obama",
-    "Joe Biden"
+    "Joe Biden",
+    "Tanya S."
 ]
+
+logger.info(type(known_face_names))
+logger.info(len(known_face_names))
 
 # Initialize some variables
 face_locations = []
