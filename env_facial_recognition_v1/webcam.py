@@ -37,8 +37,14 @@ known_face_names = [
     "Tanya S."
 ]
 
-logger.info(type(known_face_names))
-logger.info(len(known_face_names))
+
+
+
+
+logger.info(type(img3_en))
+
+logger.info(len(img3_en))
+logger.info(img3_en)
 
 # Initialize some variables
 face_locations = []

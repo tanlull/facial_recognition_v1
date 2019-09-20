@@ -168,11 +168,10 @@ def getAllFaceData():
 
     for row in rows:
         # read encoding
-    
-        encode = cPickle.loads(row[2])
-        known_face_encodings.append(encode)
-        known_face_names.append(str(row[0]))
-        known_face_ba.append(str(row[1]))
+        if(len(row[2])>10):
+            encode = cPickle.loads(row[2])
+            known_face_encodings.append(encode)
+            known_face_names.append(str(row[0]))
+            known_face_ba.append(str(row[1]))
     
     return known_face_names,known_face_encodings,known_face_ba
-
