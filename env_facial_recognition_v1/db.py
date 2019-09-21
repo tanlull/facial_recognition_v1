@@ -56,32 +56,6 @@ def insertImagePath(id,ba,path):
         logger.error(e.pgerror)
 
 
-def encode_face_image(image):
-    image_to_encode = face_recognition.load_image_file(image)
-    image_to_encode_encoding = face_recognition.face_encodings(image_to_encode)[0]
-    return image_to_encode_encoding
-
-## Store face to Postgres DB
-def SaveImage2DB(image_name,person_name,ba,encoding):
-    try:
-        insertUserProfile(ba,person_name)
-        id = db.selectUserID(ba)
-        cur = conn.cursor()
-        logger.debug("Insert {} , ba = {}".format(image_name,ba))
-        sql = """INSERT into image(id,img_path,img_encoding) Values(%s , %s , %s)"""
-        cur.execute(sql,(id,image_name,pg.Binary(encoding)))
-        conn.commit()
-        logger.debug("Successfully inserted")
-    except pg.Error as e:
-        logger.error(e.pgerror)
-
-
-
-def encode_face_image(image):
-    image_to_encode = face_recognition.load_image_file(image)
-    image_to_encode_encoding = face_recognition.face_encodings(image_to_encode)[0]
-    return image_to_encode_encoding
-
 # Update Encoding to Database
 def encode_SavetoDB(id):
     try:
@@ -208,3 +182,33 @@ def getAllFaceData():
             known_face_ba.append(str(row[1]))
     
     return known_face_names,known_face_encodings,known_face_ba
+
+
+
+### FOR Webcam_test.py #####
+
+def encode_face_image(image):
+    image_to_encode = face_recognition.load_image_file(image)
+    face_locations = face_recognition.face_locations(image_to_encode)
+    image_to_encode_encoding = face_recognition.face_encodings(image_to_encode,face_locations)[0]
+    return image_to_encode_encoding
+
+
+def save2DB(face):
+    image_encode = encode_face_image(face[0])
+    encoding = cPickle.dumps(image_encode)
+    db.SaveImage2DB(face[0],face[1],face[2],encoding)
+    
+## Store face to Postgres DB
+def SaveImage2DB(image_name,person_name,ba,encoding):
+    try:
+        insertUserProfile(ba,person_name)
+        id = db.selectUserID(ba)
+        cur = conn.cursor()
+        logger.debug("Insert {} , ba = {}".format(image_name,ba))
+        sql = """INSERT into image(id,img_path,img_encoding) Values(%s , %s , %s)"""
+        cur.execute(sql,(id,image_name,pg.Binary(encoding)))
+        conn.commit()
+        logger.debug("Successfully inserted")
+    except pg.Error as e:
+        logger.error(e.pgerror)
