@@ -1,5 +1,8 @@
+
+drop table image
+
 CREATE TABLE public.image (
-	id varchar(50) NOT NULL,
+	id integer NOT NULL,
 	img_path text NOT NULL,
 	img_encoding BYTEA  
 );

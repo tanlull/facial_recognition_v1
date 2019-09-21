@@ -5,53 +5,53 @@ from PIL import ImageFile
 import face_recognition_models
 import cv2
 import face_recognition
-
 import log as logger
+import db
+import _pickle as cPickle
 
 logger.init("webcam.py",logger.INFO)
+DB = 'test'
+db.connect(DB)
+
+def encode_face_image(image):
+    image_to_encode = face_recognition.load_image_file(image)
+    image_to_encode_encoding = face_recognition.face_encodings(image_to_encode)[0]
+    return image_to_encode_encoding
+
+def save2DB(face):
+    image_encode = encode_face_image(face[0])
+    encoding = cPickle.dumps(image_encode)
+    db.SaveImage2DB(face[0],face[1],face[2],encoding)
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 
-# Load a sample picture and learn how to recognize it.
-obama_image = face_recognition.load_image_file("obama.jpg")
-obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
 
-# Load a second sample picture and learn how to recognize it.
-biden_image = face_recognition.load_image_file("biden.jpg")
-biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
+faces = [
+    ["obama.jpg","Barack Obama","022798129"],
+    ["biden.jpg","Joe Biden","039436788"],
+    ["tanya.jpg","Tanya S.","0962536559"],
+    ["bingo.jpg","Bingo","0962536366"],
+    ["lulliya.jpg","Lulliya","025051147"]
+    ]
 
-
-img3 = face_recognition.load_image_file("tanya.jpg")
-img3_en = face_recognition.face_encodings(img3)[0]
-
-img4 = face_recognition.load_image_file("bingo.jpg")
-img4_en = face_recognition.face_encodings(img4)[0]
-
-img5 = face_recognition.load_image_file("lulliya.jpg")
-img5_en = face_recognition.face_encodings(img5)[0]
-
-# Create arrays of known face encodings and their names
-known_face_encodings = [
-    obama_face_encoding,
-    biden_face_encoding,
-    img4_en,
-    img3_en,
-    img5_en
-]
-known_face_names = [
-    "Barack Obama",
-    "Joe Biden",
-    "Bingo",
-    "Tanya S.",
-    "Lulliya "
-]
+#Save DB
+for face in faces:
+    save2DB(face)
 
 
-# logger.info(type(img3_en))
+# known_face_encodings = []
+# known_face_names =[]
+# known_face_ba = [] 
 
-# logger.info(len(img3_en))
-# logger.info(img3_en)
+# for face in faces:
+#     encode=encode_face_image(face[0])
+#     known_face_encodings.append(encode)
+#     known_face_names.append(face[1])
+
+# Get data from database
+known_face_names,known_face_encodings,known_face_ba = db.getAllFaceData()
+
 
 # Initialize some variables
 face_locations = []
@@ -76,6 +76,7 @@ while True:
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_names = []
+        face_info = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             
@@ -93,14 +94,16 @@ while True:
             logger.debug(" Match Index = {}".format(best_match_index))
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
+                info = known_face_ba[best_match_index]
 
             face_names.append(name)
+            face_info.append(info)
 
     process_this_frame = not process_this_frame
 
 
     # Display the results
-    for (top, right, bottom, left), name in zip(face_locations, face_names):
+    for (top, right, bottom, left), name, info in zip(face_locations, face_names,face_info):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
         top *= 4
         right *= 4
@@ -111,9 +114,11 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (left, bottom + 100), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (left, top - 30), (right, top), (0, 255, 0), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, name, (left + 6, top-5 ), font, 1.0, (0, 0, 0), 1)
+        cv2.putText(frame, info, (left + 6, bottom + 30), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
     cv2.imshow('Video', frame)
@@ -125,3 +130,5 @@ while True:
 # Release handle to the webcam
 video_capture.release()
 cv2.destroyAllWindows()
+
+

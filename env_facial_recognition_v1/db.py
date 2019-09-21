@@ -19,6 +19,7 @@ config.read("parameters.ini")
 conn = {};
 
 
+
 def connect(db):
     global conn
     try:
@@ -47,8 +48,7 @@ def insertImagePath(id,ba,path):
         cur = conn.cursor()
 
         for img_path in listImagePath(ba.replace('\'', ''),path):
-            sql = "INSERT INTO image(id,img_path) Values( '"+str(
-                ba)+"','"+path+ba.replace('\'', '')+"/"+img_path+"')"
+            sql = "INSERT INTO image(id,img_path) Values('"+str(id)+"','"+path+ba.replace('\'', '')+"/"+img_path+"')"
             logger.debug(sql)
             cur.execute(sql)
         conn.commit()
@@ -56,25 +56,52 @@ def insertImagePath(id,ba,path):
         logger.error(e.pgerror)
 
 
+def encode_face_image(image):
+    image_to_encode = face_recognition.load_image_file(image)
+    image_to_encode_encoding = face_recognition.face_encodings(image_to_encode)[0]
+    return image_to_encode_encoding
+
+## Store face to Postgres DB
+def SaveImage2DB(image_name,person_name,ba,encoding):
+    try:
+        insertUserProfile(ba,person_name)
+        id = db.selectUserID(ba)
+        cur = conn.cursor()
+        logger.debug("Insert {} , ba = {}".format(image_name,ba))
+        sql = """INSERT into image(id,img_path,img_encoding) Values(%s , %s , %s)"""
+        cur.execute(sql,(id,image_name,pg.Binary(encoding)))
+        conn.commit()
+        logger.debug("Successfully inserted")
+    except pg.Error as e:
+        logger.error(e.pgerror)
+
+
+
+def encode_face_image(image):
+    image_to_encode = face_recognition.load_image_file(image)
+    image_to_encode_encoding = face_recognition.face_encodings(image_to_encode)[0]
+    return image_to_encode_encoding
+
 # Update Encoding to Database
-def encode_SavetoDB(ba):
+def encode_SavetoDB(id):
     try:
         cursor = conn.cursor()
         sql="""SELECT img_path FROM image WHERE id=%s"""
-        cursor.execute(sql,(ba,))
+        cursor.execute(sql,(id,))
 
         rows = cursor.fetchall()
 
         for row in rows:
 
-            _image = face_recognition.load_image_file(str(row[0]))
+            # _image = face_recognition.load_image_file(str(row[0]))
 
-            small_frame = cv2.resize(_image, (0, 0), fx=0.25, fy=0.25)
+            # small_frame = cv2.resize(_image, (0, 0), fx=0.25, fy=0.25)
 
-            rgb_small_frame = small_frame[:, :, ::-1]
+            # rgb_small_frame = small_frame[:, :, ::-1]
             # Find all the faces and face encodings in the current frame of video
-            face_locations = face_recognition.face_locations(rgb_small_frame)
-            _encoding = face_recognition.face_encodings(rgb_small_frame, face_locations)
+            _encoding = encode_face_image(str(row[0]))
+            # face_locations = face_recognition.face_locations(rgb_small_frame)
+            # _encoding = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
             logger.debug(type(_encoding))
             logger.debug(_encoding)
@@ -91,20 +118,20 @@ def encode_SavetoDB(ba):
 
             sql = """UPDATE image SET img_encoding = %s  WHERE id = %s and img_path = %s"""
             cur = conn.cursor()
-            cur.execute(sql,(encoding, ba,str(row[0])))
+            cur.execute(sql,(pg.Binary(encoding),str(id),str(row[0])))
         conn.commit()
 
     except pg.Error as e:
         logger.error(e.pgerror)
 
 
-def decode_DB(ba):
+def decode_DB(id):
     try:
         cursor = conn.cursor()
         sql = """SELECT i.* from image i where i.id = %s"""
-        cursor.execute(sql,(ba,))
-        id = cursor.fetchone()
-        return cPickle.loads(id[2])
+        cursor.execute(sql,(str(id),))
+        first_id = cursor.fetchone()
+        return cPickle.loads(first_id[2])
     except pg.Error as e:
         logger.error(e.pgerror)
 
@@ -167,7 +194,7 @@ def getAllFaceData():
     known_face_ba =[]
     # global conn
     cursor = conn.cursor()
-    sql = '''select p.first_name,p.ba,i.img_encoding from image i,profile p where i.id = p.ba'''
+    sql = '''select p.first_name,p.ba,i.img_encoding from image i,profile p where i.id = p.id'''
     cursor.execute(sql)
 
     rows = cursor.fetchall()

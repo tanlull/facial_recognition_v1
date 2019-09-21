@@ -17,9 +17,9 @@ from PIL import Image
 
 import log as logger
 
-logger.init("Register.py",logger.INFO)
+logger.init("Register.py",logger.WARNING)
 
-N = 1
+N = 3
 BLUR_VALUE = 50
 DB = 'test'
 IMAGE_PATH = "./data/images_color/"
@@ -33,8 +33,8 @@ video_capture = cv2.VideoCapture(0)
 video_capture.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
 
-ba = input('Enter your BA: ')
-firstname = input('Enter Your First-name: ')
+ba = input('Enter your Service Number: ')
+firstname = input('Enter Your Name: ')
 
 
 directory = IMAGE_PATH+ba.replace('\'', '')+"/"
@@ -61,14 +61,9 @@ except Exception as err:
     logger.info('\nError: %s' % (str(err)))
 
 
-while cv2.waitKey(1) < 0:
+while True:
     # Capture frame-by-frame
     ret, frame = video_capture.read()
-
-    if not ret:
-        print("Done processing !!!")
-        cv2.waitKey(2000)
-        break
 
     # Resize frame of video to 1/4 size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
@@ -120,7 +115,7 @@ while cv2.waitKey(1) < 0:
         else:
 
             cv2.imwrite(IMAGE_PATH+ba.replace('\'', '')+"/" +
-                        str(random.random()) + ".jpg", frame)
+                        str(random.random()) + ".jpg", roi)
             intNumberofFiles = intNumberofFiles+1;
 
             # Draw a box around the face
@@ -136,12 +131,10 @@ while cv2.waitKey(1) < 0:
             cv2.waitKey(500)
 
     # Display the video output
-    window_name = 'Register'
-    view_window = cv2.namedWindow(window_name,cv2.WINDOW_NORMAL)
-
-    # These two lines will force the window to be on top with focus.
-    cv2.setWindowProperty(window_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
-    #cv2.setWindowProperty(window_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_NORMAL)
+    window_name = 'projector'
+    cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,
+                          cv2.WINDOW_FULLSCREEN)
     cv2.imshow(window_name, frame)
 
     # Quit video by typing Q
@@ -154,14 +147,16 @@ while cv2.waitKey(1) < 0:
 try:
     id = db.selectUserID(ba)
     db.insertImagePath(id,ba,IMAGE_PATH)
-    db.encode_SavetoDB(ba)
+    db.encode_SavetoDB(id)
 
-    x = db.decode_DB(ba)
+    x = db.decode_DB(id)
     logger.info("Save to DB Successfully")
     logger.debug(x)
     
 except Exception as err:
     logger.error('\nError: %s' % (str(err)))
+
+
 
  
 video_capture.release()
