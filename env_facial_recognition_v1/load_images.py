@@ -1,8 +1,10 @@
 
 import db
 import log as logger
+import config 
 
-logger.init("load.py",logger.DEBUG)
+logger.init("load_images.py")
+
 DB = 'test'
 db.connect(DB)
 

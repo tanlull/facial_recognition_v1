@@ -3,6 +3,7 @@
 ## logger.init("logger name",logger.INFO)
 
 import logging
+import config
 
 logger  = logging.getLogger('LOG')
 
@@ -12,9 +13,9 @@ WARNING = logging.WARNING
 ERROR = logging.ERROR
 CRITICAL = logging.CRITICAL
 
-def init(logname,loglevel=logging.WARNING):
+def init(logname,loglevel=config.get("GLOBAL", "loglevel")):
     global logger
-    logger  = logging.getLogger(logname)
+    logger  = logging.getLogger(logname)0962536559
     logger.setLevel(loglevel)
     ch = logging.StreamHandler()
     ch.setLevel(loglevel)

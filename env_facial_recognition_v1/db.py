@@ -9,30 +9,25 @@ import base64
 import cv2
 import _pickle as cPickle
 
-import log as logger
-logger.init("db.py",logger.DEBUG)
+import config 
 
-from six.moves import configparser
-config = configparser.ConfigParser()
-config.read("parameters.ini")
+import log as logger
+logger.init("db.py")
+
 
 conn = {};
 
 
-
 def connect(db):
     global conn
+    db = config.get("GLOBAL", "database")
     try:
-        if(db=="test"):
-            thost=config.get("TestDB", "host")
-            tdatabase=config.get("TestDB", "database")
-            tuser=config.get("TestDB", "user")
-            tpassword=config.get("TestDB", "password")
-        else:
-            thost=config.get("PrdDB", "host")
-            tdatabase=config.get("PrdDB", "database")
-            tuser=config.get("PrdDB", "user")
-            tpassword=config.get("PrdDB", "password")
+
+        thost=config.get(db, "host")
+        tdatabase=config.get(db, "database")
+        tuser=config.get(db, "user")
+        tpassword=config.get(db, "password")
+
        #logger.info("{0},{1},{2},{3}".format(thost,tdatabase,tuser,tpassword))
         conn = pg.connect(host=thost,database=tdatabase, user=tuser, password=tpassword)
         logger.debug("Database connect successfully")

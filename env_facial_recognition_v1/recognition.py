@@ -9,7 +9,7 @@ import log as logger
 import db
 import _pickle as cPickle
 
-logger.init("webcam.py",logger.INFO)
+logger.init("webcam.py")
 DB = 'test'
 db.connect(DB)
 

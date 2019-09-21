@@ -8,7 +8,7 @@ python recognition.py
 
 ## 3 Register image in \data\images_color\[service number] 
 ## ie. input 0962536366  -> load image in "\data\images_color\0962536366" 
-python Register_from_file.py
+python register_image_files.py
 
 
 

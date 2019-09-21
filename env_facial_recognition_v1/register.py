@@ -17,7 +17,7 @@ from PIL import Image
 
 import log as logger
 
-logger.init("Register.py",logger.DEBUG)
+logger.init("Register.py")
 
 N = 3
 BLUR_VALUE = 50

@@ -4,7 +4,7 @@ import db
 
 import log as logger
 
-logger.init("Register_from_file.py",logger.INFO)
+logger.init("register_image_files.py",logger.INFO)
 
 IMAGE_PATH = "./data/images_color/"
 DB = 'test'
