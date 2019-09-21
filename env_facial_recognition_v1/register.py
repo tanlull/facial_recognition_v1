@@ -17,7 +17,7 @@ from PIL import Image
 
 import log as logger
 
-logger.init("Register.py",logger.WARNING)
+logger.init("Register.py",logger.DEBUG)
 
 N = 3
 BLUR_VALUE = 50
@@ -149,9 +149,7 @@ try:
     db.insertImagePath(id,ba,IMAGE_PATH)
     db.encode_SavetoDB(id)
 
-    x = db.decode_DB(id)
     logger.info("Save to DB Successfully")
-    logger.debug(x)
     
 except Exception as err:
     logger.error('\nError: %s' % (str(err)))

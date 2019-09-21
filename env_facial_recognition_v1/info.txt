@@ -1,0 +1,26 @@
+## 1  Register via webcam 3 shot (DB)
+python register.py
+
+
+## 2 Recognition via webcam 
+python recognition.py
+
+
+## 3 Register image in \data\images_color\[service number] 
+## ie. input 0962536366  -> load image in "\data\images_color\0962536366" 
+python Register_from_file.py
+
+
+
+------------------------------------
+
+## load example image
+python load_images.py
+
+
+## Load image + webcam 
+python webcam_recog.py
+or
+python webcam_test.py
+
+

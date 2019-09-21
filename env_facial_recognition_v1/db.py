@@ -10,7 +10,7 @@ import cv2
 import _pickle as cPickle
 
 import log as logger
-logger.init("db.py",logger.INFO)
+logger.init("db.py",logger.DEBUG)
 
 from six.moves import configparser
 config = configparser.ConfigParser()
@@ -48,7 +48,7 @@ def insertImagePath(id,ba,path):
         cur = conn.cursor()
 
         for img_path in listImagePath(ba.replace('\'', ''),path):
-            sql = "INSERT INTO image(id,img_path) Values('"+str(id)+"','"+path+ba.replace('\'', '')+"/"+img_path+"')"
+            sql = "INSERT INTO image(id,img_path,img_encoding) Values('"+str(id)+"','"+path+ba.replace('\'', '')+"/"+img_path+"','0')"
             logger.debug(sql)
             cur.execute(sql)
         conn.commit()
@@ -60,43 +60,42 @@ def insertImagePath(id,ba,path):
 def encode_SavetoDB(id):
     try:
         cursor = conn.cursor()
-        sql="""SELECT img_path FROM image WHERE id=%s"""
-        cursor.execute(sql,(id,))
-
+        sql="""SELECT img_path,ctid FROM image WHERE id=%s and octet_length(img_encoding) < 10"""
+        cursor.execute(sql,(str(id),))
+        logger.info("Select {} Rows".format(cursor.rowcount))
         rows = cursor.fetchall()
+        logger.debug(type(rows))
+        logger.debug(rows)
 
         for row in rows:
+            ctid = str(row[1])
+            img_path = str(row[0])
+            logger.info("ctid = {0}, image_path = {1}".format(ctid,img_path))
 
-            # _image = face_recognition.load_image_file(str(row[0]))
-
-            # small_frame = cv2.resize(_image, (0, 0), fx=0.25, fy=0.25)
-
-            # rgb_small_frame = small_frame[:, :, ::-1]
-            # Find all the faces and face encodings in the current frame of video
             _encoding = encode_face_image(str(row[0]))
-            # face_locations = face_recognition.face_locations(rgb_small_frame)
-            # _encoding = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-            logger.debug(type(_encoding))
-            logger.debug(_encoding)
+            # logger.debug(type(_encoding))
+            # logger.debug(_encoding)
 
             # before write encoding to database
             encoding = cPickle.dumps(_encoding)
             logger.debug(type(encoding))
             logger.debug(encoding)
 
-            ### Convert back to list
-            #decoding2 = pickle.loads(encoding)
-            #logger.debug(type(decoding2))
-            #logger.debug(decoding2)
-
-            sql = """UPDATE image SET img_encoding = %s  WHERE id = %s and img_path = %s"""
-            cur = conn.cursor()
-            cur.execute(sql,(pg.Binary(encoding),str(id),str(row[0])))
-        conn.commit()
-
+            try:
+                sql = """UPDATE image SET img_encoding = %s  WHERE ctid = %s"""
+                cur = conn.cursor()
+                cur.execute(sql,(pg.Binary(encoding),ctid))
+                conn.commit()
+                logger.info("Update {} Row Successfully".format(cur.rowcount))
+            except pg.Error as e:
+                logger.error(e.pgerror)
+                pass
+            
+        logger.info("Finished Update Image Encoding DB!!! ")
     except pg.Error as e:
         logger.error(e.pgerror)
+        pass
 
 
 def decode_DB(id):
@@ -114,7 +113,7 @@ def decode_DB(id):
 def selectUserID(ba):
     try:
         cursor = conn.cursor()
-        sql = """SELECT id FROM profile WHERE ba=%s"""
+        sql = """SELECT id FROM profile WHERE ba=%s order by id desc"""
         cursor.execute(sql,(ba,))
         id = cursor.fetchone()
 
@@ -185,7 +184,7 @@ def getAllFaceData():
 
 
 
-### FOR Webcam_test.py #####
+### FOR load_images.py #####
 
 def encode_face_image(image):
     image_to_encode = face_recognition.load_image_file(image)

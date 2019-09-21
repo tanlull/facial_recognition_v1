@@ -13,31 +13,14 @@ logger.init("webcam.py",logger.INFO)
 DB = 'test'
 db.connect(DB)
 
+
+###### Load Example Image #####
+import load_images
+
+
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 
-
-faces = [
-    ["obama.jpg","Barack Obama","022798129"],
-    ["biden.jpg","Joe Biden","039436788"],
-    ["tanya.jpg","Tanya S.","0962536559"],
-    ["bingo.jpg","Bingo","0962536366"],
-    ["lulliya.jpg","Lulliya","025051147"]
-    ]
-
-#Save DB
-for face in faces:
-    db.save2DB(face)
-
-
-# known_face_encodings = []
-# known_face_names =[]
-# known_face_ba = [] 
-
-# for face in faces:
-#     encode=encode_face_image(face[0])
-#     known_face_encodings.append(encode)
-#     known_face_names.append(face[1])
 
 # Get data from database
 known_face_names,known_face_encodings,known_face_ba = db.getAllFaceData()
