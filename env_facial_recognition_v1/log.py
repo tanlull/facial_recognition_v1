@@ -15,7 +15,7 @@ CRITICAL = logging.CRITICAL
 
 def init(logname,loglevel=config.get("GLOBAL", "loglevel")):
     global logger
-    logger  = logging.getLogger(logname)0962536559
+    logger  = logging.getLogger(logname)
     logger.setLevel(loglevel)
     ch = logging.StreamHandler()
     ch.setLevel(loglevel)
